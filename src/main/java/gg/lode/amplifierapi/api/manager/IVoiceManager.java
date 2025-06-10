@@ -8,7 +8,14 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IVoiceManager {
     void cleanup();
+
     CompletableFuture<IVoicePlayer> fetchOrCreateVoicePlayer(Player player);
+
     IVoicePlayer getVoicePlayer(UUID uniqueId);
+
     IVoicePlayer getVoicePlayer(Player player);
+
+    boolean isEnabled();
+
+    void setEnabled(boolean enabled);
 }
