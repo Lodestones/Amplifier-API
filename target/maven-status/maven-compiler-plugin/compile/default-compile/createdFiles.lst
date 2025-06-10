@@ -1,0 +1,6 @@
+gg\lode\amplifierapi\api\event\PlayerMicrophoneEvent.class
+gg\lode\amplifierapi\api\manager\IVoiceManager.class
+gg\lode\amplifierapi\AmplifierAPI.class
+gg\lode\amplifierapi\api\data\IVoicePlayer.class
+gg\lode\amplifierapi\IAmplifierAPI.class
+gg\lode\amplifierapi\util\SoundUtil.class
