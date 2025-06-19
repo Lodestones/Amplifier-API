@@ -11,14 +11,28 @@ public interface IVoicePlayer {
     void resetWhoCanHear();
     void addWhoCanHear(UUID uuid);
     void removeWhoCanHear(UUID uuid);
+
     void setWhoCanHear(@Nullable Set<UUID> whoCanHear);
+
     UUID getUniqueId();
+
     void setPitch(float pitch);
+
     void setVolume(float volume);
+
     float getVolume();
+
     float getPitch();
+
     float getDistance();
+
     void setDistance(float distance);
+
     void setBroadcasting(boolean isBroadcasting);
+
     boolean isBroadcasting();
+
+    boolean shouldReverb();
+
+    void setShouldReverb(boolean shouldReverb);
 }
