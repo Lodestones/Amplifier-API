@@ -35,4 +35,8 @@ public interface IVoicePlayer {
     boolean shouldReverb();
 
     void setShouldReverb(boolean shouldReverb);
+
+    boolean isDeafened();
+
+    void setDeafened(boolean deafened);
 }
