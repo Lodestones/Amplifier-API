@@ -6,7 +6,7 @@
 
     <groupId>gg.lode</groupId>
     <artifactId>Amplifier-API</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>Amplifier-API</name>

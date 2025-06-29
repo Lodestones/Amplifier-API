@@ -1,16 +1,6 @@
 package gg.lode.amplifierapi.util;
 
-import com.tianscar.soundtouch.SoundTouch;
-import de.maxhenkel.sonic.Sonic;
-import it.unimi.dsi.fastutil.floats.FloatArrayList;
-
-import java.io.IOException;
-
 public class SoundUtil {
-    private static final float MIN_PITCH = 0.5f;
-    private static final float MAX_PITCH = 2.0f;
-    public static final int SAMPLE_RATE = 48000;
-    private static final int CROSSFADE_SAMPLES = 100; // Number of samples to crossfade
     
     public static short[] applyVolume(short[] input, float volume) {
         short[] output = new short[input.length];
@@ -19,93 +9,6 @@ public class SoundUtil {
             output[i] = (short) Math.max(Short.MIN_VALUE, Math.min(Short.MAX_VALUE, scaled));
         }
         return output;
-    }
-
-    public static short[] setSpeed(short[] audio, double speed) {
-        if (speed >= 0.99D && speed <= 1.01D) {
-            return audio;
-        }
-
-        Sonic stream = new Sonic(SAMPLE_RATE, 1);
-        stream.setSpeed((float) speed);
-        stream.setPitch((float) speed);
-        stream.writeShortToStream(audio, audio.length);
-        stream.flushStream();
-        int numSamples = stream.samplesAvailable();
-        short[] outSamples = new short[audio.length];
-        int readSamples = stream.readShortFromStream(outSamples, Math.min(numSamples, audio.length));
-        
-        // Apply crossfading if we have fewer samples than input
-        if (readSamples < audio.length) {
-            // Calculate crossfade region
-            int crossfadeStart = Math.max(0, readSamples - CROSSFADE_SAMPLES);
-            int crossfadeEnd = readSamples;
-            
-            // Apply crossfade
-            for (int i = crossfadeStart; i < crossfadeEnd; i++) {
-                float fadeOut = (float)(crossfadeEnd - i) / CROSSFADE_SAMPLES;
-                float fadeIn = 1.0f - fadeOut;
-                
-                // Mix the end of the processed audio with the start of the next chunk
-                if (i < audio.length) {
-                    outSamples[i] = (short)(outSamples[i] * fadeOut + audio[i] * fadeIn);
-                }
-            }
-
-            // Copy remaining samples from input
-            System.arraycopy(audio, crossfadeEnd, outSamples, crossfadeEnd, audio.length - crossfadeEnd);
-        }
-
-        return outSamples;
-    }
-
-    /**
-     * Pitch-shifts a mono 16-bit PCM buffer with SoundTouch and keeps
-     * edges smooth so no “static” clicks are left in the stream.
-     *
-     * @param samples       raw 16-bit PCM (little-endian) audio
-     * @param semitoneShift -12 - +12 semitones
-     * @return processed audio sized exactly to the data SoundTouch generated
-     */
-    public static float[] pitchAudio(float[] samples, float semitoneShift) {
-        // ── 1. Clamp shift to ±12 semitones
-        semitoneShift = Math.max(-12f, Math.min(12f, semitoneShift));
-
-        // ── 2. Configure processor
-        try (SoundTouch st = new SoundTouch()) {
-            st.setSampleRate(SAMPLE_RATE);
-            st.setChannels(1);
-            st.setPitchSemiTones(semitoneShift);
-            st.setSetting(SoundTouch.SETTING_USE_AA_FILTER, 1);
-            st.setSetting(SoundTouch.SETTING_AA_FILTER_LENGTH, 32);
-
-            // ── 3. Feed data in fixed-size chunks with explicit offset/length
-            final int CHUNK = 2048;         // 42 ms at 48 kHz mono
-            for (int offset = 0; offset < samples.length; offset += CHUNK) {
-                int len = Math.min(CHUNK, samples.length - offset);
-                st.putSamples(samples, offset, len);
-            }
-            st.flush(); // tell SoundTouch no more input is coming
-
-            // ── 4. Pull everything out, again in chunks with offset
-            FloatArrayList out = new FloatArrayList(samples.length * 2);
-            float[] buf = new float[CHUNK];
-            int got;
-            while ((got = st.receiveSamples(buf, 0, buf.length)) > 0) {
-                out.addElements(out.size(), buf, 0, got);
-            }
-
-            // ── 5. Short tail-fade to erase zipper noise
-            int fade = Math.min(64, out.size());
-            for (int i = 0; i < fade; i++) {
-                float w = (fade - i) / (float) fade;
-                int idx = out.size() - fade + i;
-                out.set(idx, out.getFloat(idx) * w);
-            }
-            return out.toFloatArray();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to process audio with SoundTouch", e);
-        }
     }
 
     /**

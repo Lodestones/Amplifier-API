@@ -3,6 +3,7 @@ package gg.lode.amplifierapi.api.manager;
 import gg.lode.amplifierapi.api.data.IVoicePlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -12,9 +13,9 @@ public interface IVoiceManager {
 
     CompletableFuture<IVoicePlayer> fetchOrCreateVoicePlayer(Player player);
 
-    IVoicePlayer getVoicePlayer(UUID uniqueId);
+    @Nullable IVoicePlayer getVoicePlayer(UUID uniqueId);
 
-    IVoicePlayer getVoicePlayer(Player player);
+    @Nullable IVoicePlayer getVoicePlayer(Player player);
 
     boolean isEnabled();
 
