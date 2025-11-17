@@ -105,7 +105,7 @@
         <dependency>
             <groupId>com.github.Lodestones</groupId>
             <artifactId>Bookshelf-API</artifactId>
-            <version>v1.1.51</version>
+            <version>1.1.71</version>
         </dependency>
         <dependency>
             <groupId>de.maxhenkel.voicechat</groupId>
