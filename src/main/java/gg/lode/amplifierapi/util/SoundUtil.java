@@ -71,4 +71,61 @@ public class SoundUtil {
         return out;
     }
 
+    /**
+     * Calculates the loudness of a voice packet (audio data).
+     * Assumes the byte array contains 16-bit PCM samples in little-endian format.
+     *
+     * @param audioData byte array containing audio samples (16-bit PCM, little-endian)
+     * @return loudness value from 0.0 to 100.0, where 100.0 represents maximum loudness
+     */
+    public static double calculateLoudness(byte[] audioData) {
+        return calculateLoudness(audioData, false);
+    }
+
+    /**
+     * Calculates the loudness of a voice packet (audio data).
+     * Assumes the byte array contains 16-bit PCM samples in little-endian format.
+     *
+     * @param audioData byte array containing audio samples (16-bit PCM, little-endian)
+     * @param modified  true if the audio has been modified via the amplifier plugin (volume, pitch, reverb, etc.)
+     * @return loudness value from 0.0 to 100.0 if not modified, or 101.0 to 1000.0 if modified
+     */
+    public static double calculateLoudness(byte[] audioData, boolean modified) {
+        if (audioData == null || audioData.length < 2) {
+            return 0.0;
+        }
+
+        // Convert byte array to 16-bit PCM samples (little-endian)
+        int sampleCount = audioData.length / 2;
+        double sumOfSquares = 0.0;
+
+        for (int i = 0; i < sampleCount; i++) {
+            int byteIndex = i * 2;
+            // Read little-endian 16-bit sample
+            int low = audioData[byteIndex] & 0xFF;
+            int high = audioData[byteIndex + 1];
+            short sample = (short) ((high << 8) | low);
+
+            // Calculate square of sample value (for RMS)
+            double normalized = sample / 32768.0; // Normalize to -1.0 to 1.0
+            sumOfSquares += normalized * normalized;
+        }
+
+        // Calculate RMS (Root Mean Square)
+        double rms = Math.sqrt(sumOfSquares / sampleCount);
+
+        // Convert RMS to a 0-100 scale
+        double baseLoudness = rms * 100.0;
+
+        if (modified) {
+            // Map 0-100 to 101-1000 range
+            // Formula: 101 + (baseLoudness * 9) maps 0->101, 100->1001, but we cap at 1000
+            double modifiedLoudness = 101.0 + (baseLoudness * 8.99);
+            return Math.max(101.0, Math.min(1000.0, modifiedLoudness));
+        } else {
+            // Standard range: 0-100
+            return Math.max(0.0, Math.min(100.0, baseLoudness));
+        }
+    }
+
 }
