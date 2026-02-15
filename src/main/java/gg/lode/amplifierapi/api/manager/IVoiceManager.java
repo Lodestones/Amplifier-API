@@ -29,4 +29,7 @@ public interface IVoiceManager {
 
     void playSound(Location location, byte[] data, float volume, float pitch, float distance);
 
+    CompletableFuture<Void> resetPlayer(Player player);
+
+    CompletableFuture<Void> resetAll();
 }

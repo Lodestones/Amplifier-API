@@ -39,4 +39,6 @@ public interface IVoicePlayer {
     boolean isDeafened();
 
     void setDeafened(boolean deafened);
+
+    void reset();
 }
