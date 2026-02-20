@@ -32,8 +32,24 @@ public interface IVoicePlayer {
 
     boolean isBroadcasting();
 
+    float getReverbIntensity();
+
+    void setReverbIntensity(float intensity);
+
+    float getReverbRoomSize();
+
+    void setReverbRoomSize(float roomSize);
+
+    /**
+     * @deprecated Use {@link #getReverbIntensity()} > 0f instead.
+     */
+    @Deprecated
     boolean shouldReverb();
 
+    /**
+     * @deprecated Use {@link #setReverbIntensity(float)} instead.
+     */
+    @Deprecated
     void setShouldReverb(boolean shouldReverb);
 
     boolean isDeafened();

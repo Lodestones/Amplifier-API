@@ -18,7 +18,9 @@ public class SoundUtil {
      * @param roomSize 0 … 1 ⇢ decay length (0.7 ≈ medium hall)
      * @param wetMix   0 … 1 ⇢ how much reverb to blend in (0.3 = subtle)
      * @return processed buffer, same length as input
+     * @deprecated Use {@link ReverbProcessor} for stateful reverb that persists across audio frames.
      */
+    @Deprecated
     public static float[] applyReverb(float[] in, float roomSize, float wetMix) {
         final int[] combDelays = {1116, 1188, 1277, 1356};   // @48 kHz ≈ 23-28 ms
         final int[] allPassDelays = {556, 441};                // 11 ms & 9 ms
