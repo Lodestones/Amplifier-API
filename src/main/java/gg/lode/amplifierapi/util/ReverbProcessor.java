@@ -44,10 +44,28 @@ public class ReverbProcessor {
      * @return processed buffer, same length as input
      */
     public float[] process(float[] in, float roomSize, float wetMix) {
-        float feedback = 0.28f + 0.72f * roomSize;
         float[] out = new float[in.length];
+        process(in, out, in.length, roomSize, wetMix);
+        return out;
+    }
 
-        for (int n = 0; n < in.length; n++) {
+    /**
+     * Variant of {@link #process(float[], float, float)} that writes into a
+     * caller-supplied {@code out} buffer instead of allocating a new array.
+     * {@code in} and {@code out} may refer to the same array. State carries
+     * across calls so reverb tails decay smoothly between packets.
+     *
+     * @param in       mono 32-bit PCM, range +/-1.0f
+     * @param out      output buffer, must be at least {@code length} long;
+     *                 may alias {@code in} for in-place reverb
+     * @param length   number of samples to process
+     * @param roomSize 0-1, decay length
+     * @param wetMix   0-1, how much reverb to blend in
+     */
+    public void process(float[] in, float[] out, int length, float roomSize, float wetMix) {
+        float feedback = 0.28f + 0.72f * roomSize;
+
+        for (int n = 0; n < length; n++) {
             float sample = in[n];
 
             // --- comb filter group
@@ -74,7 +92,6 @@ public class ReverbProcessor {
             // --- wet / dry mix
             out[n] = sample * (1f - wetMix) + rev * wetMix;
         }
-        return out;
     }
 
     /**

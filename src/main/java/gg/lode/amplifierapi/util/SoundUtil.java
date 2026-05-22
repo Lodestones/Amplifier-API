@@ -1,14 +1,34 @@
 package gg.lode.amplifierapi.util;
 
 public class SoundUtil {
-    
+
     public static short[] applyVolume(short[] input, float volume) {
         short[] output = new short[input.length];
-        for (int i = 0; i < input.length; i++) {
+        applyVolume(input, output, volume, input.length);
+        return output;
+    }
+
+    /**
+     * In-place volume scaling. Mutates {@code data} so hot voice paths can
+     * avoid the per-packet {@code short[]} allocation from the array-returning
+     * variant. Same clipping behavior as {@link #applyVolume(short[], float)}.
+     *
+     * @param data   PCM samples to scale (modified in place)
+     * @param volume scale factor (1f = identity)
+     */
+    public static void applyVolumeInPlace(short[] data, float volume) {
+        applyVolume(data, data, volume, data.length);
+    }
+
+    /**
+     * Volume-scale {@code length} samples from {@code input} into {@code output}.
+     * {@code input} and {@code output} may refer to the same array.
+     */
+    public static void applyVolume(short[] input, short[] output, float volume, int length) {
+        for (int i = 0; i < length; i++) {
             float scaled = input[i] * volume;
             output[i] = (short) Math.max(Short.MIN_VALUE, Math.min(Short.MAX_VALUE, scaled));
         }
-        return output;
     }
 
     /**
