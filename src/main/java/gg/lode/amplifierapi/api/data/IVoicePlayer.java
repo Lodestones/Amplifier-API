@@ -56,5 +56,16 @@ public interface IVoicePlayer {
 
     void setDeafened(boolean deafened);
 
+    /**
+     * Whether this player is muted. A muted player's outgoing voice packets are
+     * dropped before any audio processing or routing occurs. Unlike setting
+     * {@link #setVolume(float)} to {@code 0f} or clearing {@link #setWhoCanHear(Set)},
+     * mute is an explicit first-class flag intended for moderation / cross-plugin
+     * integrations that need to query "is this player currently muted?".
+     */
+    boolean isMuted();
+
+    void setMuted(boolean muted);
+
     void reset();
 }
