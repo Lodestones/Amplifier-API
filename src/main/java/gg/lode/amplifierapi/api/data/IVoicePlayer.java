@@ -67,5 +67,25 @@ public interface IVoicePlayer {
 
     void setMuted(boolean muted);
 
+    /**
+     * Whether this player's voice is routed to the real-time (priority) Cipher
+     * stream for low-latency transcription/TTS (e.g. the Verity scenario). This
+     * is an explicit first-class flag rather than a Bukkit permission so the
+     * async voice path can read it without a main-thread permission race.
+     */
+    boolean isPriority();
+
+    void setPriority(boolean priority);
+
+    /**
+     * Whether this player is exempt from voice moderation. Their speech is still
+     * transcribed and logged, but the moderation service takes no action against
+     * them. Like {@link #setPriority(boolean)}, this is a first-class data flag
+     * (not a Bukkit permission) so the async voice path can read it race-free.
+     */
+    boolean isModerationBypass();
+
+    void setModerationBypass(boolean moderationBypass);
+
     void reset();
 }
