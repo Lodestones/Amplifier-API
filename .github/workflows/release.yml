@@ -15,7 +15,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          # paper-api 1.21.4 ships Java 21 (class v65) bytecode — a 17 JDK can't read it.
+          # Matches the JDK 21 pin in jitpack.yml; the pom's source/target 17 still applies.
+          java-version: '21'
           distribution: 'temurin'
       - run: mvn clean package -B
       - id: version
